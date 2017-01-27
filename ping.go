@@ -297,10 +297,14 @@ func (p *Pinger) run() {
 			close(p.done)
 		case <-p.done:
 			wg.Wait()
+			timeout.Stop()
+			interval.Stop()
 			return
 		case <-timeout.C:
 			close(p.done)
 			wg.Wait()
+			timeout.Stop()
+			interval.Stop()
 			return
 		case <-interval.C:
 			err = p.sendICMP(conn)
@@ -316,6 +320,8 @@ func (p *Pinger) run() {
 			if p.Count > 0 && p.PacketsRecv >= p.Count {
 				close(p.done)
 				wg.Wait()
+				timeout.Stop()
+				interval.Stop()
 				return
 			}
 		}
